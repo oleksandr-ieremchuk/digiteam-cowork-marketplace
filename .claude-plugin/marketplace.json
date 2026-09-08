@@ -1,0 +1,29 @@
+{
+  "name": "digiteam",
+  "owner": {
+    "name": "Oleksandr Ieremchuk",
+    "email": "oleksandr.ieremchuk@chatrevenue.ai"
+  },
+  "metadata": {
+    "description": "DigiTeam plugins for Claude Cowork and Claude Code — multi-repo feature delivery orchestration.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "delivery-orchestrator",
+      "source": "./plugins/delivery-orchestrator",
+      "description": "Cowork side of the delivery process: locate a feature's phase across repos, run the review gates, hand work to Claude Code, verify integration, author docs.",
+      "version": "0.1.0",
+      "category": "productivity",
+      "keywords": ["delivery", "orchestration", "cowork", "multi-repo", "handoff"]
+    },
+    {
+      "name": "delivery-executor",
+      "source": "./plugins/delivery-executor",
+      "description": "Claude Code side of the delivery process: execute a Delivery HandOff in one repo (plan, implement, deploy+verify, review docs, move plan stages) and print a Delivery Report.",
+      "version": "0.1.0",
+      "category": "productivity",
+      "keywords": ["delivery", "handoff", "report", "claude-code", "plan-stages"]
+    }
+  ]
+}
