@@ -1,7 +1,7 @@
 # DigiTeam plugin marketplace — bootstrap
 
 - **Slug:** `marketplace-bootstrap`
-- **Status:** plan approved (gate 1, 2026-09-08) — executing (phase 2)
+- **Status:** shipped v0.1.0 (gates 1/3/5 passed 2026-09-08) — documenting (phase 6)
 - **Amended:** 2026-09-08 after plan review — file count (§5, §7.1), author field (§3.3), `.gitattributes` (§3.1), protocol parity (§4)
 - **Author:** Cowork (orchestrator), 2026-09-08
 - **Target repos:** `digiteam-cowork-marketplace` (this repo) — single-repo feature
