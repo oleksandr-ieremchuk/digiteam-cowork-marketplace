@@ -824,7 +824,7 @@ Expected: empty output. **Phase 2 ends here:** print the Delivery Report and sto
 - Consumes: the validated, fully committed `main` from Tasks 1–5
 - Produces: the public URL both READMEs already advertise, and the `origin` remote Task 8 pushes the tag to
 
-- [ ] **Step 1: Confirm the gate and the preconditions**
+- [x] **Step 1: Confirm the gate and the preconditions**
 
 ```bash
 git status --short
@@ -836,7 +836,7 @@ gh repo view oleksandr-ieremchuk/digiteam-cowork-marketplace 2>&1 | head -3
 
 Expected: a clean tree; branch `main`; the phase-0b and phase-2 commits; `gh` authenticated as `oleksandr-ieremchuk`; and the repo view **failing** with "Could not resolve to a Repository" — it must not exist yet. If it does exist, stop and report a blocker: do not push into a pre-existing repo without Cowork's say.
 
-- [ ] **Step 2: Create the public repo (no push yet)**
+- [x] **Step 2: Create the public repo (no push yet)**
 
 ```bash
 gh repo create oleksandr-ieremchuk/digiteam-cowork-marketplace \
@@ -847,7 +847,7 @@ gh repo view oleksandr-ieremchuk/digiteam-cowork-marketplace --json name,visibil
 
 Expected: created, with `"visibility": "PUBLIC"` and exactly that description.
 
-- [ ] **Step 3: Add the remote and push `main`**
+- [x] **Step 3: Add the remote and push `main`**
 
 ```bash
 git remote add origin git@github.com:oleksandr-ieremchuk/digiteam-cowork-marketplace.git
@@ -857,7 +857,7 @@ git push -u origin main
 
 Expected: the push succeeds and `main` tracks `origin/main`. (`gh auth status` reports ssh as the git protocol; if ssh fails, switch the remote to `https://github.com/oleksandr-ieremchuk/digiteam-cowork-marketplace.git` and record the substitution as a deviation.)
 
-- [ ] **Step 4: Verify the pushed state (spec §7.6)**
+- [x] **Step 4: Verify the pushed state (spec §7.6)**
 
 ```bash
 gh repo view oleksandr-ieremchuk/digiteam-cowork-marketplace --json visibility,defaultBranchRef,url
@@ -868,7 +868,7 @@ gh api repos/oleksandr-ieremchuk/digiteam-cowork-marketplace/contents/.claude-pl
 
 Expected: `PUBLIC`, default branch `main`, the same commits locally and remotely, an empty diff, and the API returning `marketplace.json` — which is exactly the reachability Cowork's phase-5 check needs.
 
-- [ ] **Step 5: Verify the remote install path end to end**
+- [x] **Step 5: Verify the remote install path end to end**
 
 These are the same commands the README gives users:
 
@@ -883,7 +883,7 @@ claude plugin marketplace remove digiteam
 
 Expected: the GitHub-sourced marketplace adds cleanly, the plugin installs from it, and the cleanup leaves no trace.
 
-- [ ] **Step 6: Confirm the README is served by GitHub**
+- [x] **Step 6: Confirm the README is served by GitHub**
 
 ```bash
 gh api repos/oleksandr-ieremchuk/digiteam-cowork-marketplace/readme --jq '.name, .size'
@@ -903,7 +903,7 @@ Expected: `README.md` and a non-zero size. Note in the Report that visual render
 - Consumes: the pushed `main` from Task 7, verified by its Steps 4–6
 - Produces: the `v0.1.0` release marker the README's versioning section describes, and the `done` plan stage the phase-5 acceptance gate reads
 
-- [ ] **Step 1: Confirm Task 7's verification passed and no tag exists**
+- [x] **Step 1: Confirm Task 7's verification passed and no tag exists**
 
 ```bash
 git ls-remote --tags origin
@@ -912,7 +912,7 @@ git tag
 
 Expected: both empty. Per spec §3.5 the tag goes on **after** the push passes verification — if anything in Task 7 Steps 4–6 failed, stop and report instead of tagging.
 
-- [ ] **Step 2: Check the version agreement one last time**
+- [x] **Step 2: Check the version agreement one last time**
 
 ```bash
 python - <<'EOF'
@@ -929,14 +929,14 @@ EOF
 
 Expected: every version present reads `0.1.0`. `marketplace.metadata` is `None` only if DP2 forced the `metadata` block out — already reported as a deviation in that case.
 
-- [ ] **Step 3: Create and push the annotated tag**
+- [x] **Step 3: Create and push the annotated tag**
 
 ```bash
 git tag -a v0.1.0 -m "digiteam marketplace v0.1.0 — delivery-orchestrator + delivery-executor"
 git push origin v0.1.0
 ```
 
-- [ ] **Step 4: Verify the tag landed on the pushed commit**
+- [x] **Step 4: Verify the tag landed on the pushed commit**
 
 ```bash
 git ls-remote --tags origin
@@ -947,7 +947,7 @@ git rev-parse HEAD
 
 Expected: `refs/tags/v0.1.0` present remotely, and the tag's target commit equal to local `HEAD`.
 
-- [ ] **Step 5: Move the plan `ongoing → done` and commit (phase 4's stage move)**
+- [x] **Step 5: Move the plan `ongoing → done` and commit (phase 4's stage move)**
 
 ```bash
 git mv engineering_plans/ongoing/marketplace-bootstrap-plan.md engineering_plans/done/marketplace-bootstrap-plan.md
