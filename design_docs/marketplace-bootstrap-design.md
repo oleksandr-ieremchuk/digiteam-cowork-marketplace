@@ -1,7 +1,8 @@
 # DigiTeam plugin marketplace — bootstrap
 
 - **Slug:** `marketplace-bootstrap`
-- **Status:** spec — ready for planning (phase 0b)
+- **Status:** plan approved (gate 1, 2026-09-08) — executing (phase 2)
+- **Amended:** 2026-09-08 after plan review — file count (§5, §7.1), author field (§3.3), `.gitattributes` (§3.1), protocol parity (§4)
 - **Author:** Cowork (orchestrator), 2026-09-08
 - **Target repos:** `digiteam-cowork-marketplace` (this repo) — single-repo feature
 
@@ -42,6 +43,7 @@ digiteam-cowork-marketplace/
 │   └── marketplace.json
 ├── README.md
 ├── LICENSE                                   (MIT)
+├── .gitattributes                            (`* text=auto eol=lf` — keep skill files LF on every clone)
 ├── design_docs/
 │   └── marketplace-bootstrap-design.md       ← this spec (Cowork-authored)
 ├── engineering_plans/
@@ -117,7 +119,9 @@ note it as a deviation — the names, sources and descriptions are the contract.
 Per https://code.claude.com/docs/en/plugins-reference. Each plugin:
 
 - `name` exactly as in marketplace.json; `version: "0.1.0"`; `description`
-  (same text as marketplace entry); `author` (same as owner);
+  (same text as marketplace entry); `author: { "name": "Oleksandr Ieremchuk" }`
+  — name only, no email, so that §7.3 holds (the email lives in
+  marketplace.json `owner`, outside `plugins/`);
   `repository: "https://github.com/oleksandr-ieremchuk/digiteam-cowork-marketplace"`;
   `license: "MIT"`; `keywords`.
 - Skills are discovered from the default `skills/` folder — do **not** add a
@@ -170,18 +174,23 @@ contains and its trigger phrases, and a pointer to the root README.
   keeps stage folders truthful with `git mv` + commit, prints the Report.
 - HandOff and Report shapes are **identical** in both plugins' references
   (`handoff-prompt.md` ↔ `handoff-format.md`, `report-format.md` ↔
-  `report-format.md`). This is the cross-plugin contract that integration
+  `report-format.md`), including the blocked variants `Phase completed: none —
+  blocked` / `Plan stage now: none`. This is the cross-plugin contract that integration
   verification (phase 5) checks.
 
 ## 5. Content already authored by Cowork (commit as-is)
 
-Cowork has placed the following files in the working folder at their final
-paths. They are the product; Code does not rewrite them (typo fixes are fine,
-report them as deviations):
+Cowork has placed the following **14 files** in the working folder at their
+final paths (13 under `plugins/` + this spec). They are the product; Code does
+not rewrite them (typo fixes are fine, report them as deviations):
 
 - `design_docs/marketplace-bootstrap-design.md` (this file)
-- `plugins/delivery-orchestrator/skills/orchestrating-delivery/SKILL.md` + `references/*` (8 files)
-- `plugins/delivery-executor/skills/executing-delivery-handoff/SKILL.md` + `references/*` (3 files)
+- `plugins/delivery-orchestrator/skills/orchestrating-delivery/SKILL.md` + `references/*` (1 + 8 = 9 files)
+- `plugins/delivery-executor/skills/executing-delivery-handoff/SKILL.md` + `references/*` (1 + 3 = 4 files)
+
+Amended after plan review (2026-09-08): this spec and the orchestrator's
+`references/report-format.md` were edited by Cowork; their hashes differ from
+the plan's inventory — re-baseline those two.
 
 Known caveat: the orchestrator skill was recovered from a synced copy in which
 three files were truncated at the tail (`SKILL.md`, `references/phase-map.md`,
@@ -198,8 +207,8 @@ few lines each). Sasha should diff against his original before v0.1.0 is tagged.
 
 ## 7. Acceptance criteria (phase 3 / 5 gates)
 
-1. Repo layout matches §3.1 exactly; all 12 Cowork-authored files present,
-   byte-identical apart from reported typo fixes.
+1. Repo layout matches §3.1 exactly; all 14 Cowork-authored files present,
+   byte-identical to the re-baselined inventory apart from reported typo fixes.
 2. `.claude-plugin/marketplace.json` and both `plugin.json` are valid JSON and
    pass `claude plugin validate .` (or the current equivalent) with no errors.
 3. `grep -ri "chatrevenue\|sasha" plugins/` returns nothing.
