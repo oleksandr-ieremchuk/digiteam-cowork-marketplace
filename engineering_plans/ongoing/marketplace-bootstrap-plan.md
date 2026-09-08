@@ -37,7 +37,7 @@
 | `.gitattributes` | `* text=auto eol=lf` — keeps the commit-as-is skill files LF on every clone (spec §3.1, amended at gate 1) | Task 3 |
 | `design_docs/marketplace-bootstrap-design.md` | The spec | Cowork — committed in phase 0b |
 | `engineering_plans/{drafts,ongoing,done,documented}/.gitkeep` | Plan lifecycle stage folders | phase 0b |
-| `engineering_plans/drafts/marketplace-bootstrap-plan.md` | This plan | phase 0b |
+| `engineering_plans/<stage>/marketplace-bootstrap-plan.md` | This plan — written in `drafts/` (phase 0b), moved to `ongoing/` at the start of phase 2, to `done/` at the end of phase 4 | phase 0b |
 | `plugins/delivery-orchestrator/.claude-plugin/plugin.json` | Orchestrator plugin manifest | Task 2 |
 | `plugins/delivery-orchestrator/README.md` | Which tool it is for, its one skill + trigger phrases, pointer to root README | Task 5 |
 | `plugins/delivery-orchestrator/skills/orchestrating-delivery/**` | 9 Cowork-authored files (`SKILL.md` + 8 references) | commit as-is, Task 1 |
@@ -47,9 +47,9 @@
 
 ## Cowork-authored content — commit as-is (typo fixes reported as deviations)
 
-Spec §5 and §7.1 say "12 files". The folder actually holds **13 files under `plugins/`** (2 × `SKILL.md` + 11 `references/*.md`), plus the spec itself = **14 Cowork-authored files**. The per-folder counts in §3.1 (8 orchestrator references, 3 executor references) match reality, so "12" is a miscount in the spec, not a missing file. The list below is the authoritative inventory; report the count correction as a deviation.
+Spec §5 and §7.1 originally said "12 files"; the folder holds **13 files under `plugins/`** (2 × `SKILL.md` + 11 `references/*.md`) plus the spec itself = **14 Cowork-authored files**. Accepted at gate 1 and the spec was corrected to 14, so this is no longer a deviation. The list below is the authoritative inventory.
 
-SHA-256 as found on disk at planning time (the phase-3 review can re-run `sha256sum` against these to prove byte-identity):
+SHA-256 as re-baselined at the start of phase 2 (the phase-3 review can re-run `sha256sum` against these to prove byte-identity). Rows 1 and 9 are the two files Cowork amended after gate 1; the other 12 hashes are unchanged from planning time, verified by diff before Task 1:
 
 | # | File | sha256 |
 |---|---|---|
@@ -73,7 +73,7 @@ Already checked read-only during planning: the §5 truncation caveat looks resol
 ## Decisions this plan takes (flag at the phase-1 gate)
 
 - **DP1 — `plugin.json` `author` carries no email. Accepted at gate 1 and folded into the spec (§3.3 now says `author: { "name": "Oleksandr Ieremchuk" }`), so it is no longer a deviation.** The original conflict: §3.3 said `author` = the owner (`oleksandr.ieremchuk@chatrevenue.ai`) while §7.3 requires `grep -ri "chatrevenue" plugins/` to return nothing. The email stays in root `marketplace.json`, outside `plugins/`.
-- **DP2 — `marketplace.json` shape falls back if the validator objects.** Write it per §3.2 (`metadata.description` + `metadata.version`) plus a `$schema` line, then validate. The only real marketplace manifest installed on this machine uses a top-level `description` and no `metadata`/`version` at all, so rejection is plausible: fall back to top-level `description`, keep the per-plugin `version`, re-validate, and record each dropped field as a deviation (§3.2 explicitly allows this). Never change a `name`, `source` or `description` — those are the contract.
+- **DP2 — `marketplace.json` shape falls back if the validator objects. Outcome (phase 2): only `$schema` was dropped.** The manifest was written per §3.2 (`metadata.description` + `metadata.version`) plus a `$schema` line the plan added on its own; `claude plugin validate .` rejected exactly one key — `root: Unrecognized key: "$schema"` — so it was removed and all three validations then passed. Everything the spec's §3.2 JSON actually specifies survives: `metadata.description`, `metadata.version`, per-plugin `version`, `category` and `keywords` are all accepted. No `name`, `source` or `description` was touched.
 - **DP3 — the tag is plain `v0.1.0`.** Spec §3.5 asks for `v0.1.0`. Note that `claude plugin tag` produces `{name}--v{version}` tags instead, so it is not used. Both plugins share one version, so a single repo-level tag is unambiguous.
 - **DP4 — protocol delta, resolved by Cowork before phase 2, nothing for Code to do.** The executor's `report-format.md` allowed two enum values the orchestrator's copy omitted (`Phase completed: none — blocked`, `Plan stage now: none`). Cowork amended the orchestrator's `report-format.md` (re-baselined, row 9 above) and §4 of the spec; the two Report blocks are now byte-identical, verified with `diff <(awk '/^Delivery Report/,/^Ready for gate/' …orchestrator…) <(awk … …executor…)` → no output.
 
@@ -91,7 +91,7 @@ Already checked read-only during planning: the §5 truncation caveat looks resol
 - Consumes: the working folder as Cowork left it (phase 0b already committed `design_docs/`, `engineering_plans/` and this plan)
 - Produces: `plugins/delivery-orchestrator/skills/orchestrating-delivery/` and `plugins/delivery-executor/skills/executing-delivery-handoff/` tracked in git at the hashes above — the `source` targets Task 2's manifests point at
 
-- [ ] **Step 1: Record the pre-commit hashes as the byte-identity baseline**
+- [x] **Step 1: Record the pre-commit hashes as the byte-identity baseline**
 
 ```bash
 find plugins design_docs -type f | sort | xargs sha256sum > /tmp/cowork-authored.sha256
@@ -100,7 +100,7 @@ cat /tmp/cowork-authored.sha256
 
 Expected: 14 lines matching the inventory table exactly. If any hash differs, stop — the folder changed since planning. Report it as a blocker rather than committing silently.
 
-- [ ] **Step 2: Run the reference-integrity check (spec §7.4) before committing**
+- [x] **Step 2: Run the reference-integrity check (spec §7.4) before committing**
 
 Every `references/<file>.md` named in a `SKILL.md` must exist next to it:
 
@@ -115,7 +115,7 @@ done
 
 Expected: only `OK` lines — 8 for the orchestrator, 3 for the executor. Any `MISS` is a blocker (a commit-as-is file references something Cowork did not deliver); report it, do not invent the missing file.
 
-- [ ] **Step 3: Run the generic-wording check (spec §7.3)**
+- [x] **Step 3: Run the generic-wording check (spec §7.3)**
 
 ```bash
 grep -rin "chatrevenue\|sasha" plugins/ ; echo "exit=$?"
@@ -123,7 +123,7 @@ grep -rin "chatrevenue\|sasha" plugins/ ; echo "exit=$?"
 
 Expected: no output and `exit=1`. A match is a blocker — do not rewrite skill text to make it pass; report it.
 
-- [ ] **Step 4: Confirm nothing else is staged, then stage `plugins/` and the amended spec**
+- [x] **Step 4: Confirm nothing else is staged, then stage `plugins/` and the amended spec**
 
 ```bash
 git status --short
@@ -133,7 +133,7 @@ git status --short
 
 Expected: before, `?? plugins/` plus `M design_docs/marketplace-bootstrap-design.md`; after, 13 `A` lines under `plugins/` and one `M` for the spec, nothing else.
 
-- [ ] **Step 5: Verify the staged bytes equal the on-disk bytes**
+- [x] **Step 5: Verify the staged bytes equal the on-disk bytes**
 
 ```bash
 git diff --cached --stat | tail -1
@@ -142,13 +142,13 @@ sha256sum -c /tmp/cowork-authored.sha256
 
 Expected: `14 files changed, …`; every `sha256sum -c` line reads `OK`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git commit -m "$(printf '%s\n' 'feat: add Cowork-authored delivery skills as-is' '' 'Two skill trees, byte-identical to what Cowork authored: orchestrating-delivery' '(SKILL.md + 8 references) and executing-delivery-handoff (SKILL.md + 3' 'references). Also carries Cowork post-gate-1 amendments to the spec and to the' "orchestrator's report-format.md (the blocked-variant parity fix)." '' 'Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>')"
 ```
 
-- [ ] **Step 7: Verify the commit holds exactly the 14 files**
+- [x] **Step 7: Verify the commit holds exactly the 14 files**
 
 ```bash
 git show --stat --name-only HEAD | grep -c '^plugins/'
@@ -171,7 +171,7 @@ Expected: `13`, then `1`.
 - Consumes: the skill trees committed in Task 1 — each `source` must resolve to a folder holding `plugin.json` + `skills/*/SKILL.md`
 - Produces: marketplace name `digiteam`, plugin names `delivery-orchestrator` and `delivery-executor` — the exact strings Tasks 4–6 document and install (`delivery-executor@digiteam`)
 
-- [ ] **Step 1: Run the validator first, to see it fail**
+- [x] **Step 1: Run the validator first, to see it fail**
 
 ```bash
 claude plugin validate .
@@ -179,7 +179,7 @@ claude plugin validate .
 
 Expected: FAIL — there is no `.claude-plugin/marketplace.json` here yet. Record the exact wording; it is the "before" half of the §7.2 evidence.
 
-- [ ] **Step 2: Write `.claude-plugin/marketplace.json`**
+- [x] **Step 2: Write `.claude-plugin/marketplace.json`**
 
 ```bash
 mkdir -p .claude-plugin
@@ -220,7 +220,7 @@ python -c "import json;json.load(open('.claude-plugin/marketplace.json'));print(
 
 Expected: `valid JSON`.
 
-- [ ] **Step 3: Write `plugins/delivery-orchestrator/.claude-plugin/plugin.json`**
+- [x] **Step 3: Write `plugins/delivery-orchestrator/.claude-plugin/plugin.json`**
 
 Per DP1 the `author` carries a name only; no `dependencies`, no `skills`.
 
@@ -242,7 +242,7 @@ python -c "import json;json.load(open('plugins/delivery-orchestrator/.claude-plu
 
 Expected: `valid JSON`.
 
-- [ ] **Step 4: Write `plugins/delivery-executor/.claude-plugin/plugin.json`**
+- [x] **Step 4: Write `plugins/delivery-executor/.claude-plugin/plugin.json`**
 
 ```bash
 mkdir -p plugins/delivery-executor/.claude-plugin
@@ -262,7 +262,7 @@ python -c "import json;json.load(open('plugins/delivery-executor/.claude-plugin/
 
 Expected: `valid JSON`.
 
-- [ ] **Step 5: Run all three validations to verify they pass**
+- [x] **Step 5: Run all three validations to verify they pass**
 
 ```bash
 claude plugin validate .
@@ -274,7 +274,7 @@ Expected: PASS with no errors, three times. Paste the actual output into the Rep
 
 If the marketplace validation rejects `metadata` (or `$schema`, or the per-plugin `version`/`keywords`), apply DP2: drop the rejected field, move the description to a top-level `description` if `metadata` goes, re-run until clean, and record each dropped field as a deviation. If a plugin validation demands an explicit skills declaration, add `"skills": ["./skills"]` and record that as a deviation too (spec §3.3 permits it only under validator pressure).
 
-- [ ] **Step 6: Confirm the name/source contract mechanically**
+- [x] **Step 6: Confirm the name/source contract mechanically**
 
 This is also the check Cowork re-runs at the phase-5 integration gate (spec §8):
 
@@ -301,7 +301,7 @@ EOF
 
 Expected: two `OK` lines, then `contract OK`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add .claude-plugin plugins/delivery-orchestrator/.claude-plugin plugins/delivery-executor/.claude-plugin
@@ -324,7 +324,7 @@ Expected: exactly 3 files added.
 - Consumes: nothing
 - Produces: the file both `plugin.json` `"license": "MIT"` fields refer to and the root README's License section links to (Task 4), plus the repo-level LF guarantee the §7.1 byte-identity criterion rests on
 
-- [ ] **Step 1: Verify it is missing**
+- [x] **Step 1: Verify it is missing**
 
 ```bash
 test -f LICENSE && echo present || echo absent
@@ -332,7 +332,7 @@ test -f LICENSE && echo present || echo absent
 
 Expected: `absent`.
 
-- [ ] **Step 2: Write the MIT license**
+- [x] **Step 2: Write the MIT license**
 
 ```bash
 cat > LICENSE <<'EOF'
@@ -363,7 +363,7 @@ head -3 LICENSE
 
 Expected: `MIT License`, a blank line, then the copyright line.
 
-- [ ] **Step 3: Write `.gitattributes`** (spec §3.1, amended at gate 1)
+- [x] **Step 3: Write `.gitattributes`** (spec §3.1, amended at gate 1)
 
 ```bash
 printf '%s\n' '* text=auto eol=lf' > .gitattributes
@@ -373,7 +373,7 @@ git check-attr text eol -- plugins/delivery-executor/skills/executing-delivery-h
 
 Expected: the file reads `* text=auto eol=lf`, and `check-attr` reports `text: auto` and `eol: lf` for a skill file.
 
-- [ ] **Step 4: Verify the attributes file changed no bytes**
+- [x] **Step 4: Verify the attributes file changed no bytes**
 
 ```bash
 git status --short
@@ -382,7 +382,7 @@ sha256sum -c /tmp/cowork-authored.sha256
 
 Expected: only `?? .gitattributes` plus whatever else is legitimately new — **no `M` line for any committed skill file** (the blobs are already LF, so renormalisation is a no-op). Every `sha256sum -c` line still `OK`. An `M` on a skill file means git wants to rewrite the content: stop and report, do not commit it.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add LICENSE .gitattributes
@@ -402,7 +402,7 @@ git commit -m "$(printf '%s\n' 'chore: add MIT license and LF line-ending policy
 - Consumes: the marketplace name `digiteam` and both plugin names from Task 2
 - Produces: the canonical install instructions the per-plugin READMEs (Task 5) link back to, and the §7.6 artifact ("README renders with the connect instructions for both tools")
 
-- [ ] **Step 1: Verify it is missing**
+- [x] **Step 1: Verify it is missing**
 
 ```bash
 test -f README.md && echo present || echo absent
@@ -410,7 +410,7 @@ test -f README.md && echo present || echo absent
 
 Expected: `absent`.
 
-- [ ] **Step 2: Write the README with the eight sections of spec §3.4, in order**
+- [x] **Step 2: Write the README with the eight sections of spec §3.4, in order**
 
 Write the file with the Write tool (its content contains nested fenced code blocks, which a heredoc inside a fenced block cannot carry safely). Content, verbatim:
 
@@ -551,7 +551,7 @@ the repo `vX.Y.Z` and push the tag.
 MIT — see [LICENSE](LICENSE).
 ````
 
-- [ ] **Step 3: Verify every required section and command is present**
+- [x] **Step 3: Verify every required section and command is present**
 
 ```bash
 for s in "^# DigiTeam plugin marketplace" "^## Connect to Cowork" "^## Connect to Claude Code" \
@@ -568,7 +568,7 @@ grep -q "superpowers-marketplace" README.md && echo "OK   superpowers link"
 
 Expected: eight `OK` section lines plus five more `OK` lines, and no `MISS`.
 
-- [ ] **Step 4: Verify the phase table did not drift from the skill's own phase map**
+- [x] **Step 4: Verify the phase table did not drift from the skill's own phase map**
 
 ```bash
 diff <(grep '^| [0-9]' plugins/delivery-orchestrator/skills/orchestrating-delivery/references/phase-map.md) \
@@ -577,7 +577,7 @@ diff <(grep '^| [0-9]' plugins/delivery-orchestrator/skills/orchestrating-delive
 
 Expected: at most the shortened phase-6 tool cell (the README drops the `references/documentation-pass.md` path, which means nothing outside the plugin). Any different owner or gate wording is a defect — fix the README, never the skill file.
 
-- [ ] **Step 5: Verify the fenced JSON block parses**
+- [x] **Step 5: Verify the fenced JSON block parses**
 
 ```bash
 python - <<'EOF'
@@ -591,7 +591,7 @@ EOF
 
 Expected: `1 json block(s) parse`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add README.md
@@ -611,7 +611,7 @@ git commit -m "$(printf '%s\n' 'docs: add root README with connect instructions 
 - Consumes: the root README from Task 4 — both link back to `../../README.md`
 - Produces: nothing later tasks depend on, except that Task 6's §7.3 grep now also covers these two files
 
-- [ ] **Step 1: Verify both are missing**
+- [x] **Step 1: Verify both are missing**
 
 ```bash
 ls plugins/*/README.md 2>/dev/null || echo "none yet"
@@ -619,7 +619,7 @@ ls plugins/*/README.md 2>/dev/null || echo "none yet"
 
 Expected: `none yet`.
 
-- [ ] **Step 2: Write the orchestrator README**
+- [x] **Step 2: Write the orchestrator README**
 
 ```bash
 cat > plugins/delivery-orchestrator/README.md <<'EOF'
@@ -649,7 +649,7 @@ Install instructions, the full phase table and the repo conventions are in the
 EOF
 ```
 
-- [ ] **Step 3: Write the executor README**
+- [x] **Step 3: Write the executor README**
 
 ```bash
 cat > plugins/delivery-executor/README.md <<'EOF'
@@ -680,7 +680,7 @@ Install instructions, the full phase table and the repo conventions are in the
 EOF
 ```
 
-- [ ] **Step 4: Verify both READMEs cover the required points and stay generic**
+- [x] **Step 4: Verify both READMEs cover the required points and stay generic**
 
 ```bash
 grep -q "Cowork" plugins/delivery-orchestrator/README.md \
@@ -696,7 +696,7 @@ grep -rin "chatrevenue\|sasha" plugins/ ; echo "generic-grep exit=$?"
 
 Expected: `OK orchestrator`, `OK executor`, and `generic-grep exit=1` with no matches.
 
-- [ ] **Step 5: Re-validate — the new files must not break either plugin**
+- [x] **Step 5: Re-validate — the new files must not break either plugin**
 
 ```bash
 claude plugin validate ./plugins/delivery-orchestrator
@@ -705,7 +705,7 @@ claude plugin validate ./plugins/delivery-executor
 
 Expected: PASS, twice.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add plugins/delivery-orchestrator/README.md plugins/delivery-executor/README.md
@@ -724,7 +724,7 @@ git commit -m "$(printf '%s\n' 'docs: add per-plugin READMEs' '' 'Each names the
 - Consumes: everything built in Tasks 1–5
 - Produces: the phase-2 evidence block for the Delivery Report — real command output for spec §7 criteria 1–5 and 7
 
-- [ ] **Step 1: Record the pre-existing local plugin state, so cleanup can restore it**
+- [x] **Step 1: Record the pre-existing local plugin state, so cleanup can restore it**
 
 ```bash
 claude plugin marketplace list
@@ -733,7 +733,7 @@ claude plugin list
 
 Expected: `digiteam` is **not** listed. If it is (a leftover from an earlier run), remove it first with `claude plugin marketplace remove digiteam`.
 
-- [ ] **Step 2: Add this repo as a local marketplace (spec §7.5)**
+- [x] **Step 2: Add this repo as a local marketplace (spec §7.5)**
 
 ```bash
 claude plugin marketplace add ./
@@ -742,7 +742,7 @@ claude plugin marketplace list
 
 Expected: success, and `digiteam` appears with a local source pointing at this folder. If `./` is rejected, retry with the absolute path and record the substitution as a deviation.
 
-- [ ] **Step 3: Install the executor plugin**
+- [x] **Step 3: Install the executor plugin**
 
 ```bash
 claude plugin install delivery-executor@digiteam
@@ -751,7 +751,7 @@ claude plugin list
 
 Expected: the install succeeds and `delivery-executor` appears as installed/enabled.
 
-- [ ] **Step 4: Confirm the skill is discoverable**
+- [x] **Step 4: Confirm the skill is discoverable**
 
 ```bash
 find ~/.claude/plugins -path '*delivery-executor*' -name 'SKILL.md'
@@ -760,7 +760,7 @@ grep -m1 '^name:' plugins/delivery-executor/skills/executing-delivery-handoff/SK
 
 Expected: a `SKILL.md` path under the installed plugin, and `name: executing-delivery-handoff`. Note in the Report that the human-facing confirmation is the skill list inside an interactive `claude` session; this session is non-interactive, so `claude plugin list` plus the installed `SKILL.md` path is the evidence recorded.
 
-- [ ] **Step 5: Install the orchestrator too, proving both sources resolve**
+- [x] **Step 5: Install the orchestrator too, proving both sources resolve**
 
 ```bash
 claude plugin install delivery-orchestrator@digiteam
@@ -770,7 +770,7 @@ find ~/.claude/plugins -path '*delivery-orchestrator*' -name 'SKILL.md'
 
 Expected: the install succeeds and the orchestrator's `SKILL.md` is present under the installed copy.
 
-- [ ] **Step 6: Run the whole §7 acceptance sweep in one pass and capture the output**
+- [x] **Step 6: Run the whole §7 acceptance sweep in one pass and capture the output**
 
 ```bash
 echo "== 7.1 layout + authored files =="
@@ -791,7 +791,7 @@ git status --short; git log --oneline
 
 Expected: the §3.1 layout with no extra files; every `sha256sum -c` line `OK`; three validator passes; `exit=1` on the grep with no matches; `refs checked` with no `MISS`; four stage folders with the plan in `ongoing/` (phase 2 moved it there at its start; phase 4 moves it to `done/`); a clean tree.
 
-- [ ] **Step 7: Clean up the local install state**
+- [x] **Step 7: Clean up the local install state**
 
 ```bash
 claude plugin uninstall delivery-executor
@@ -802,7 +802,7 @@ claude plugin marketplace list
 
 Expected: `digiteam` gone and the machine back to its pre-test state. Leaving the local-path install in place would shadow the GitHub-sourced install tested in phase 4.
 
-- [ ] **Step 8: No commit — this task changes no files**
+- [x] **Step 8: No commit — this task changes no files**
 
 ```bash
 git status --short
