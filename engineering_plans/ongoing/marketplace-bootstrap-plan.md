@@ -22,7 +22,7 @@
 - Out of scope (spec §6): hooks, agents, MCP servers, CI schema validation, publishing to any curated directory, removing Sasha's personal copy of the skill.
 - The 14 files listed under "Cowork-authored content" below are **committed as-is (typo fixes reported as deviations)**.
 - Default branch is `main`. `init.defaultBranch` is unset globally, so always pass `-b main`.
-- **Line endings stay LF.** Git for Windows had `core.autocrlf=true` in system config, which would have rewritten the commit-as-is files to CRLF on checkout and broken the §7.1 byte-identity claim. Phase 0b set `core.autocrlf=false` and `core.eol=lf` in this repo's local config (no tracked `.gitattributes`, so the §3.1 layout stays exact). Verify with `git config core.autocrlf` → `false` before staging anything, and re-verify with `sha256sum -c` after each commit.
+- **Line endings stay LF.** Git for Windows had `core.autocrlf=true` in system config, which would have rewritten the commit-as-is files to CRLF on checkout and broken the §7.1 byte-identity claim. Phase 0b set `core.autocrlf=false` and `core.eol=lf` in this repo's local config; gate 1 additionally requires a **tracked `.gitattributes`** with `* text=auto eol=lf` so every clone gets LF regardless of local config (spec §3.1 amended — Task 3 creates it). Verify with `git config core.autocrlf` → `false` before staging anything, and re-verify with `sha256sum -c` after each commit.
 - Phase discipline: Tasks 1–6 are **phase 2** (build + validate locally). Tasks 7–8 are **phase 4** (create the GitHub repo, push, tag) and must not start before Cowork's phase-3 deploy-approval gate.
 
 ---
@@ -34,6 +34,7 @@
 | `.claude-plugin/marketplace.json` | Marketplace manifest: name `digiteam`, owner, the two plugin entries | Task 2 |
 | `README.md` | Root docs: what this is, connect-to-Cowork, connect-to-Claude-Code, superpowers prerequisite, phase table, repo conventions, versioning, license | Task 4 |
 | `LICENSE` | MIT, © 2026 Oleksandr Ieremchuk | Task 3 |
+| `.gitattributes` | `* text=auto eol=lf` — keeps the commit-as-is skill files LF on every clone (spec §3.1, amended at gate 1) | Task 3 |
 | `design_docs/marketplace-bootstrap-design.md` | The spec | Cowork — committed in phase 0b |
 | `engineering_plans/{drafts,ongoing,done,documented}/.gitkeep` | Plan lifecycle stage folders | phase 0b |
 | `engineering_plans/drafts/marketplace-bootstrap-plan.md` | This plan | phase 0b |
@@ -52,7 +53,7 @@ SHA-256 as found on disk at planning time (the phase-3 review can re-run `sha256
 
 | # | File | sha256 |
 |---|---|---|
-| 1 | `design_docs/marketplace-bootstrap-design.md` | `cdb8ef5c88d9f7d13bd85f40e418f682ebcec708c6306f1e7f62c41a524b0875` |
+| 1 | `design_docs/marketplace-bootstrap-design.md` | `4f16dfbd92b7741137b8fa891bf4863d60c94e99a92bdaeef1ec78d4bd844bbf` (re-baselined 2026-09-08 — Cowork amended §3.1, §3.3, §4, §5, §7.1 and the status line after plan review; the phase-0b commit holds the pre-amendment version, Task 1 commits this one) |
 | 2 | `plugins/delivery-orchestrator/skills/orchestrating-delivery/SKILL.md` | `e8d1137b0b2400bb50474ae1283a9ec4c552deb516f9ea6c844f2cdccc2bc83e` |
 | 3 | `…/orchestrating-delivery/references/architecture-doc-template.md` | `08a3369f53506fa4c9ae3cc10a1e06655d5c4202e1c4861ce7240af98a77dc84` |
 | 4 | `…/orchestrating-delivery/references/documentation-pass.md` | `4b7acc70361731f3e80874f555f524f850401e0462b71116cbad5d6eaa8fc1d7` |
@@ -60,7 +61,7 @@ SHA-256 as found on disk at planning time (the phase-3 review can re-run `sha256
 | 6 | `…/orchestrating-delivery/references/integration-verification.md` | `7ac64262417da22b95541165474a23b73f58633bef77390548d15f6d0ee4d995` |
 | 7 | `…/orchestrating-delivery/references/phase-map.md` | `faf9b8d21d20635a3bfb9014a5d697974bda15cf0e57334e6c605d79176259d1` |
 | 8 | `…/orchestrating-delivery/references/readme-lifecycle-amendment.md` | `d301a48ebda4a0fb77e205838241a949cd3a66b824b416342b871c8a4bbf30ba` |
-| 9 | `…/orchestrating-delivery/references/report-format.md` | `6e893e58004dab599707476e1cde85da33644f0c08a5dc7469c354ca51653088` |
+| 9 | `…/orchestrating-delivery/references/report-format.md` | `8f43623f553fe1384a1266a2f335f32bcb7e823c23869bccac486256df6fa2ae` (re-baselined 2026-09-08 — Cowork added the `none — blocked` / `none` variants, closing DP4) |
 | 10 | `…/orchestrating-delivery/references/state-discovery.md` | `6fcb3a9352b0a1262ca910c4be2ace5bdc5a3962a1a379fcba39b25f07c31d79` |
 | 11 | `plugins/delivery-executor/skills/executing-delivery-handoff/SKILL.md` | `85e631d617a352de4a6333e959bab25316aec9cbf9a5f959817943b1562425b0` |
 | 12 | `…/executing-delivery-handoff/references/handoff-format.md` | `899a4e9fe09179891bb6e2c563b515454db79d6a5b62accc3350665f06dbcf20` |
@@ -71,10 +72,10 @@ Already checked read-only during planning: the §5 truncation caveat looks resol
 
 ## Decisions this plan takes (flag at the phase-1 gate)
 
-- **DP1 — `plugin.json` `author` carries no email.** Spec §3.3 says `author` = the owner (`oleksandr.ieremchuk@chatrevenue.ai`), but spec §7.3 requires `grep -ri "chatrevenue" plugins/` to return nothing. Both cannot hold. Resolution: `"author": { "name": "Oleksandr Ieremchuk" }` in both `plugin.json` files; the email stays in root `marketplace.json`, which sits outside `plugins/` and so passes §7.3. Reported as a deviation from §3.3.
+- **DP1 — `plugin.json` `author` carries no email. Accepted at gate 1 and folded into the spec (§3.3 now says `author: { "name": "Oleksandr Ieremchuk" }`), so it is no longer a deviation.** The original conflict: §3.3 said `author` = the owner (`oleksandr.ieremchuk@chatrevenue.ai`) while §7.3 requires `grep -ri "chatrevenue" plugins/` to return nothing. The email stays in root `marketplace.json`, outside `plugins/`.
 - **DP2 — `marketplace.json` shape falls back if the validator objects.** Write it per §3.2 (`metadata.description` + `metadata.version`) plus a `$schema` line, then validate. The only real marketplace manifest installed on this machine uses a top-level `description` and no `metadata`/`version` at all, so rejection is plausible: fall back to top-level `description`, keep the per-plugin `version`, re-validate, and record each dropped field as a deviation (§3.2 explicitly allows this). Never change a `name`, `source` or `description` — those are the contract.
 - **DP3 — the tag is plain `v0.1.0`.** Spec §3.5 asks for `v0.1.0`. Note that `claude plugin tag` produces `{name}--v{version}` tags instead, so it is not used. Both plugins share one version, so a single repo-level tag is unambiguous.
-- **DP4 — observed protocol delta, recorded not fixed.** The executor's `report-format.md` allows two enum values the orchestrator's copy does not list (`Phase completed: none — blocked`, `Plan stage now: none`). Field set and order are identical. Flagged here so Cowork's phase-5 parity check does not read it as drift — these are commit-as-is files, so no edit is made.
+- **DP4 — protocol delta, resolved by Cowork before phase 2, nothing for Code to do.** The executor's `report-format.md` allowed two enum values the orchestrator's copy omitted (`Phase completed: none — blocked`, `Plan stage now: none`). Cowork amended the orchestrator's `report-format.md` (re-baselined, row 9 above) and §4 of the spec; the two Report blocks are now byte-identical, verified with `diff <(awk '/^Delivery Report/,/^Ready for gate/' …orchestrator…) <(awk … …executor…)` → no output.
 
 ---
 
@@ -83,7 +84,7 @@ Already checked read-only during planning: the §5 truncation caveat looks resol
 ### Task 1: Commit the Cowork-authored plugin content as-is
 
 **Files:**
-- Commit (no edits): the 13 files under `plugins/` from the inventory above
+- Commit (no edits): the 13 files under `plugins/` from the inventory above, **plus the amended `design_docs/marketplace-bootstrap-design.md`** — phase 0b committed its pre-amendment form, so it shows as `M` and travels in this commit as content, not as a rewrite by Code
 - Test: the reference-integrity loop and the generic-wording grep, plus `sha256sum -c`
 
 **Interfaces:**
@@ -122,15 +123,15 @@ grep -rin "chatrevenue\|sasha" plugins/ ; echo "exit=$?"
 
 Expected: no output and `exit=1`. A match is a blocker — do not rewrite skill text to make it pass; report it.
 
-- [ ] **Step 4: Confirm nothing else is staged, then stage only `plugins/`**
+- [ ] **Step 4: Confirm nothing else is staged, then stage `plugins/` and the amended spec**
 
 ```bash
 git status --short
-git add plugins/
+git add plugins/ design_docs/marketplace-bootstrap-design.md
 git status --short
 ```
 
-Expected: before, 13 `??` lines under `plugins/`; after, 13 `A` lines and nothing else.
+Expected: before, `?? plugins/` plus `M design_docs/marketplace-bootstrap-design.md`; after, 13 `A` lines under `plugins/` and one `M` for the spec, nothing else.
 
 - [ ] **Step 5: Verify the staged bytes equal the on-disk bytes**
 
@@ -139,21 +140,22 @@ git diff --cached --stat | tail -1
 sha256sum -c /tmp/cowork-authored.sha256
 ```
 
-Expected: `13 files changed, …`; every `sha256sum -c` line reads `OK`.
+Expected: `14 files changed, …`; every `sha256sum -c` line reads `OK`.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git commit -m "$(printf '%s\n' 'feat: add Cowork-authored delivery skills as-is' '' 'Two skill trees, byte-identical to what Cowork authored: orchestrating-delivery' '(SKILL.md + 8 references) and executing-delivery-handoff (SKILL.md + 3' 'references).' '' 'Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>')"
+git commit -m "$(printf '%s\n' 'feat: add Cowork-authored delivery skills as-is' '' 'Two skill trees, byte-identical to what Cowork authored: orchestrating-delivery' '(SKILL.md + 8 references) and executing-delivery-handoff (SKILL.md + 3' 'references). Also carries Cowork post-gate-1 amendments to the spec and to the' "orchestrator's report-format.md (the blocked-variant parity fix)." '' 'Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>')"
 ```
 
-- [ ] **Step 7: Verify the commit holds exactly the 13 files**
+- [ ] **Step 7: Verify the commit holds exactly the 14 files**
 
 ```bash
 git show --stat --name-only HEAD | grep -c '^plugins/'
+git show --name-only --format="" HEAD | grep -c 'design_docs/'
 ```
 
-Expected: `13`.
+Expected: `13`, then `1`.
 
 ---
 
@@ -311,15 +313,16 @@ Expected: exactly 3 files added.
 
 ---
 
-### Task 3: LICENSE (MIT)
+### Task 3: LICENSE (MIT) and `.gitattributes`
 
 **Files:**
 - Create: `LICENSE`
-- Test: `head -3 LICENSE`
+- Create: `.gitattributes`
+- Test: `head -3 LICENSE`; `git check-attr text eol -- <a skill file>`; `sha256sum -c` still clean after the attributes file exists
 
 **Interfaces:**
 - Consumes: nothing
-- Produces: the file both `plugin.json` `"license": "MIT"` fields refer to and the root README's License section links to (Task 4)
+- Produces: the file both `plugin.json` `"license": "MIT"` fields refer to and the root README's License section links to (Task 4), plus the repo-level LF guarantee the §7.1 byte-identity criterion rests on
 
 - [ ] **Step 1: Verify it is missing**
 
@@ -360,11 +363,30 @@ head -3 LICENSE
 
 Expected: `MIT License`, a blank line, then the copyright line.
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: Write `.gitattributes`** (spec §3.1, amended at gate 1)
 
 ```bash
-git add LICENSE
-git commit -m "$(printf '%s\n' 'chore: add MIT license' '' 'Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>')"
+printf '%s\n' '* text=auto eol=lf' > .gitattributes
+cat .gitattributes
+git check-attr text eol -- plugins/delivery-executor/skills/executing-delivery-handoff/SKILL.md
+```
+
+Expected: the file reads `* text=auto eol=lf`, and `check-attr` reports `text: auto` and `eol: lf` for a skill file.
+
+- [ ] **Step 4: Verify the attributes file changed no bytes**
+
+```bash
+git status --short
+sha256sum -c /tmp/cowork-authored.sha256
+```
+
+Expected: only `?? .gitattributes` plus whatever else is legitimately new — **no `M` line for any committed skill file** (the blobs are already LF, so renormalisation is a no-op). Every `sha256sum -c` line still `OK`. An `M` on a skill file means git wants to rewrite the content: stop and report, do not commit it.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add LICENSE .gitattributes
+git commit -m "$(printf '%s\n' 'chore: add MIT license and LF line-ending policy' '' 'text=auto eol=lf keeps the commit-as-is skill files LF on every clone, which is' 'what the byte-identity acceptance criterion rests on.' '' 'Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>')"
 ```
 
 ---
