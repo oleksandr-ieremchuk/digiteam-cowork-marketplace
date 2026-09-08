@@ -73,9 +73,11 @@ every checkout gets the plugin:
 
 ## Prerequisite: superpowers
 
-Both skills delegate the thinking-heavy steps to the `superpowers` skills —
-`superpowers:brainstorming` (phase 0a), `superpowers:writing-plans` (0b) and
-`superpowers:executing-plans` (2). Install that marketplace too:
+Both skills delegate the thinking-heavy steps to the `superpowers` skills, but
+not to the same ones. The orchestrator uses `superpowers:brainstorming`
+(phase 0a), `superpowers:writing-plans` (0b) and `superpowers:executing-plans`
+(2); the executor uses `superpowers:writing-plans` and
+`superpowers:executing-plans`. Install that marketplace too:
 
 ```bash
 claude plugin marketplace add obra/superpowers-marketplace
