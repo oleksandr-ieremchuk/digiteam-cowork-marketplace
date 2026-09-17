@@ -8,15 +8,20 @@ Keep it a pointer, not a re-derivation of the spec: Code reads the spec and the
 plan itself. State the phase to run, the gate already passed, and the per-repo
 acceptance criteria, then name the `superpowers` skill to use.
 
-On the Code side the `delivery-executor` plugin (skill
-`executing-delivery-handoff`) recognises the `Delivery HandOff —` header,
+**The first line of every HandOff is the executor's slash command**,
+`/delivery-executor:executing-delivery-handoff`, followed by the block. Pasted
+into Claude Code as one message, that line invokes the `delivery-executor`
+skill deterministically and hands it the rest of the block as its argument —
+auto-triggering from the header text alone proved unreliable. The skill then
 checks the repo's plan stage against the requested phase, runs the phase, and
-prints the Report in the exact shape below. The HandOff works without it too —
-the block is self-describing.
+prints the Report in the exact shape below. If the plugin is not installed the
+command is rejected; the user installs it (README) or removes the first line
+and runs the block by hand — it is self-describing.
 
 ## Template
 
 ```
+/delivery-executor:executing-delivery-handoff
 Delivery HandOff — <feature-slug> — repo: <repo-name>
 
 Spec: <path to design_docs/...-design.md in this repo>
@@ -25,7 +30,6 @@ Phase to run: <0b write the plan | 2 execute | 4 deploy + functional verify | 7 
 Gate already passed: <e.g. "plan approved 2026-06-16" | "none — first handoff">
 
 Do:
-- Run this HandOff with `executing-delivery-handoff` (delivery-executor plugin) if installed.
 - Use <superpowers:writing-plans | superpowers:executing-plans | the relevant step>.
 - <phase-specific instruction — see below>
 

@@ -4,9 +4,16 @@ Cowork pastes one of these per repo. It is chat text, never a file. Treat it as
 the authoritative statement of *what to do in this repo now*; treat the spec and
 the plan it points to as the authoritative statement of *what the feature is*.
 
+It normally reaches you as the argument of your own slash command — the block's
+first line is `/delivery-executor:executing-delivery-handoff`, so the rest
+arrives as `$ARGUMENTS`. It may also arrive as a plain pasted message, or the
+user may run the slash command with nothing after it; in that last case ask
+them to paste the HandOff before doing anything.
+
 ## Shape
 
 ```
+/delivery-executor:executing-delivery-handoff
 Delivery HandOff — <feature-slug> — repo: <repo-name>
 
 Spec: <path to design_docs/...-design.md in this repo>
@@ -15,7 +22,6 @@ Phase to run: <0b write the plan | 2 execute | 4 deploy + functional verify | 7 
 Gate already passed: <e.g. "plan approved 2026-06-16" | "none — first handoff" | "none — corrective">
 
 Do:
-- Run this HandOff with `executing-delivery-handoff` (delivery-executor plugin) if installed.
 - Use <superpowers:writing-plans | superpowers:executing-plans | the relevant step>.
 - <phase-specific instruction>
 
@@ -36,6 +42,7 @@ Report back:
 
 | Field | What you do with it |
 |---|---|
+| slash line | Your own invocation; carries no data. Ignore it when parsing. |
 | header `<slug>` / `<repo>` | Identify the feature and confirm you are in the right repo. Every artifact you create carries the slug. |
 | `Spec` | Read it first. Find the target-repo list and this repo's scope. |
 | `Your scope in this repo` | The boundary of what you implement. Anything else in the spec belongs to another repo. |

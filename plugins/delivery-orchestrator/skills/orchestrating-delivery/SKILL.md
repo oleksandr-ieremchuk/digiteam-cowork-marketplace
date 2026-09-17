@@ -42,8 +42,10 @@ the user pastes back.
 
 - **HandOff (you → Code):** a copy-paste chat block, one per repo, that tells
   Claude Code which repo, which spec, the scope for that repo, the phase to
-  execute, the gate already passed, and the acceptance criteria. Build it from
-  `references/handoff-prompt.md`. Never write it to a file.
+  execute, the gate already passed, and the acceptance criteria. Its first line
+  is always `/delivery-executor:executing-delivery-handoff`, so pasting it
+  invokes the executor skill. Build it from `references/handoff-prompt.md`.
+  Never write it to a file.
 - **Report (Code → you):** text Claude Code prints at the end of its run, which
   the user pastes back to you. It carries what changed, verification results,
   deviations, blockers, and which gate it's ready for. Parse it per

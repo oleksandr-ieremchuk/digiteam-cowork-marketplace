@@ -2,7 +2,9 @@
 name: executing-delivery-handoff
 description: >
   Use in Claude Code when the user pastes a "Delivery HandOff — <slug> — repo:
-  <name>" block from Cowork, or says "run this handoff", "here's the handoff",
+  <name>" block from Cowork — normally as the argument of this skill's own slash
+  command, /delivery-executor:executing-delivery-handoff, which is the block's
+  first line — or says "run this handoff", "here's the handoff",
   "execute the delivery handoff", "print the delivery report", "move the plan to
   ongoing/done/documented", and equivalents in the user's language. You are the
   single-repo executor in a multi-repo delivery process: you verify the repo and
@@ -26,7 +28,9 @@ is text you print. Neither is ever written to a file.
 
 ## Step 1 — Parse the HandOff
 
-Extract from the pasted block (shape in `references/handoff-format.md`):
+The block is in `$ARGUMENTS` when you were invoked by the slash command, else
+in the user's message. If both are empty, ask the user to paste the HandOff and
+stop. Extract from the block (shape in `references/handoff-format.md`):
 
 - **slug** and **repo** from the header line;
 - **spec** path, **scope** in this repo, **phase to run** (0b / 2 / 4 / 7 / 8),
