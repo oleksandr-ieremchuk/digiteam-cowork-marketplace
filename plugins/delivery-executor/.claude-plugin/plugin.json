@@ -1,6 +1,6 @@
 {
   "name": "delivery-executor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Claude Code side of the delivery process: execute a Delivery HandOff in one repo (plan, implement, deploy+verify, review docs, move plan stages) and print a Delivery Report.",
   "author": { "name": "Oleksandr Ieremchuk" },
   "repository": "https://github.com/oleksandr-ieremchuk/digiteam-cowork-marketplace",

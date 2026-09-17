@@ -1,6 +1,6 @@
 {
   "name": "delivery-orchestrator",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Cowork side of the delivery process: locate a feature's phase across repos, run the review gates, hand work to Claude Code, verify integration, author docs.",
   "author": { "name": "Oleksandr Ieremchuk" },
   "repository": "https://github.com/oleksandr-ieremchuk/digiteam-cowork-marketplace",
