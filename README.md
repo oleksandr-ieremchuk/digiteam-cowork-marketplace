@@ -52,6 +52,12 @@ claude plugin marketplace add oleksandr-ieremchuk/digiteam-cowork-marketplace
 claude plugin install delivery-executor@digiteam
 ```
 
+Every Delivery HandOff Cowork produces begins with the line
+`/delivery-executor:executing-delivery-handoff`, so pasting the whole block
+into Claude Code as a single message runs the executor on it directly. If
+Claude Code reports that command as unknown, the plugin is not installed — run
+the two commands above.
+
 For a whole team, commit this to the repo's `.claude/settings.json` instead, so
 every checkout gets the plugin:
 
@@ -130,6 +136,10 @@ Bump `version` in `.claude-plugin/marketplace.json` (both the `metadata` block
 and the affected plugin entries) and in each changed
 `plugins/*/.claude-plugin/plugin.json`, keeping the two in agreement; then tag
 the repo `vX.Y.Z` and push the tag.
+
+`v0.1.1` is the first bump after the initial release. Both plugins move
+together even when only one of them changed, so all five `version`
+occurrences change on every release.
 
 ## License
 
