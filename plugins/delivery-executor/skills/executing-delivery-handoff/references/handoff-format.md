@@ -16,8 +16,7 @@ them to paste the HandOff before doing anything.
 /delivery-executor:executing-delivery-handoff
 Delivery HandOff — <feature-slug> — repo: <repo-name>
 
-Spec: <path to design_docs/...-design.md in this repo>
-Your scope in this repo: <the slice of the feature this repo owns>
+Spec: <design_docs/<feature-slug>-design.md — this repo's own spec>
 Phase to run: <0b write the plan | 2 execute | 4 deploy + functional verify | 7 review docs | 8 move done→documented>
 Gate already passed: <e.g. "plan approved 2026-06-16" | "none — first handoff" | "none — corrective">
 
@@ -44,8 +43,7 @@ Report back:
 |---|---|
 | slash line | Your own invocation; carries no data. Ignore it when parsing. |
 | header `<slug>` / `<repo>` | Identify the feature and confirm you are in the right repo. Every artifact you create carries the slug. |
-| `Spec` | Read it first. Find the target-repo list and this repo's scope. |
-| `Your scope in this repo` | The boundary of what you implement. Anything else in the spec belongs to another repo. |
+| `Spec` | This repo's own spec; everything in it is yours. Read it first. It never needs another repo — a path or link into one is a blocker. |
 | `Phase to run` | The one phase you execute. Required starting plan stage and end stage are in `phase-map.md`. |
 | `Gate already passed` | Tells you the gate Cowork cleared to send this. `none — corrective` means a gate **failed** and this is the re-do. |
 | `Do:` | Which `superpowers` skill and phase-specific instruction to follow. |

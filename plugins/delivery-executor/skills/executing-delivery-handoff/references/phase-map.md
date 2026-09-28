@@ -10,7 +10,7 @@ one of those five.
 | **0b** write the plan | spec present, **no plan** for the slug | `superpowers:writing-plans` from the spec, scoped to this repo; save in `drafts/`; commit | `drafts` | 1 — plan review |
 | **2** execute | `drafts` | `git mv drafts → ongoing`, commit; `superpowers:executing-plans`; commit as the plan prescribes; **no deploy, no move to done** | `ongoing` | 3 — change review + deploy approval |
 | **4** deploy + functional verify | `ongoing` | deploy per repo convention; run in-repo functional verification; `git mv ongoing → done`, commit | `done` | 5 — acceptance + integration verification (cross-repo) |
-| **7** review docs | `done` | read Cowork's architecture prose / ADRs against the real code; approve or list mismatches; **no move** | `done` | — (Cowork fixes docs or sends phase 8) |
+| **7** review docs | `done` | check the listed doc files against their sha256 and that the design home has no unlisted uncommitted change (else blocked); then read the docs against the real code, for self-containment (no path or link into another repository), and that Contracts & integrations matches the real interfaces; approve or list mismatches; **no move** | `done` | — (Cowork fixes docs or sends phase 8) |
 | **8** move to documented | `done` (docs approved) | `git mv done → documented`, commit | `documented` | — feature done for this repo |
 
 ## Plan lifecycle folders

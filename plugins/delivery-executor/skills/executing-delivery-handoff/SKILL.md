@@ -33,8 +33,8 @@ in the user's message. If both are empty, ask the user to paste the HandOff and
 stop. Extract from the block (shape in `references/handoff-format.md`):
 
 - **slug** and **repo** from the header line;
-- **spec** path, **scope** in this repo, **phase to run** (0b / 2 / 4 / 7 / 8),
-  **gate already passed**;
+- **spec** path (this repo's own spec; all of it is yours), **phase to run**
+  (0b / 2 / 4 / 7 / 8), **gate already passed**;
 - **acceptance criteria** (the checklist you must satisfy);
 - an optional **Fix:** block — present only on a corrective HandOff.
 
@@ -45,8 +45,10 @@ If a field you need is missing, ask before doing anything.
 1. **Right repo.** The current working directory is the repo named in the
    header (check the folder name and `git remote -v`). If not, stop and say so —
    never run another repo's HandOff here.
-2. **Spec present** at the given path. Read it; find the slug and this repo's
-   scope in it.
+2. **Spec present** at the given path. Read it and find the slug. The spec is
+   this repo's own; everything in it is yours to implement. If it points at a
+   path or link in another repository, do not follow it: report it under
+   `Blockers` and stop.
 3. **Plan stage matches the phase.** Discover the plan lifecycle folders by
    inspection (usually `engineering_plans/{drafts,ongoing,done,documented}`;
    never hardcode) and locate the plan carrying the slug. The required starting
@@ -64,7 +66,7 @@ State what you found (repo, spec, plan stage, phase) before acting.
 Details per phase in `references/phase-map.md`. In short:
 
 - **0b — write the plan.** Read the spec; write the implementation plan for
-  *this repo's scope only* with `superpowers:writing-plans`; save it in
+  *this repo only* with `superpowers:writing-plans`; save it in
   `drafts/` named by the slug; commit.
 - **2 — execute.** `git mv` the plan `drafts → ongoing` and commit that move
   first. Then execute the plan with `superpowers:executing-plans`, committing as
@@ -75,9 +77,14 @@ Details per phase in `references/phase-map.md`. In short:
   checks, whatever the plan and acceptance criteria call for); then `git mv`
   the plan `ongoing → done` and commit. If verification fails, do not move the
   plan; report the failure.
-- **7 — review docs.** Cowork has authored architecture prose / ADRs. Read
-  them against the real code and list every mismatch; approve only when there
-  are none. No plan move in this phase.
+- **7 — review docs.** Cowork has authored architecture prose / ADRs in the
+  working tree, and the HandOff lists each file with its sha256. First confirm
+  that the files on disk match those hashes and that the design home has no
+  uncommitted change the HandOff does not list. Either mismatch → a blocked
+  Report. Then check three things and list every mismatch: the docs match the
+  real code; they are self-contained (no path or link into another repository);
+  the **Contracts & integrations** tables (Provides / Consumes) match the real
+  interfaces. Approve only when there are none. No plan move in this phase.
 - **8 — move to documented.** `git mv` the plan `done → documented` and commit.
   Nothing else.
 
@@ -104,6 +111,9 @@ file and do not commit it.
 - **One repo, one phase, one HandOff.** Never touch another repository; never
   run the next phase "while you're at it"; never advance the plan stage beyond
   what the phase specifies.
+- **Never leave this repository.** Do not read or follow a path into another
+  repository, even when a spec, plan or doc mentions one. Report it under
+  `Blockers` instead.
 - **The stage folder is the truth.** Every stage move is a `git mv` plus a
   commit, done at the moment the phase says. Cowork gates on that folder.
 - **Stay in scope.** Implement what the spec assigns to this repo and what the
