@@ -51,7 +51,7 @@ Paths abbreviate `plugins/delivery-orchestrator/skills/orchestrating-delivery/` 
 | D6 | Gate "specs consistent" | O/`SKILL.md` → "Routing per phase" + "The phases and gates"; O/`references/phase-map.md` → row 0a Gate column; O/`references/state-discovery.md` → "Between 0a and 0b"; `README.md` → row 0a | `specs consistent` + `the identical shape` |
 | D7 | HandOff: `Spec:` = this repo's spec, no scope field | O/`references/handoff-prompt.md` → intro + Template; E/`references/handoff-format.md` → Shape + Field table; E/`SKILL.md` → Step 1, Step 2.2; O/`SKILL.md` → HandOff bullet + "Multi-repo fan-out" | `this repo's own spec` (both HandOff files) + absence of `Your scope in this repo` |
 | D8 | Contracts & integrations, Provides / Consumes, six columns | O/`references/architecture-doc-template.md` → `architecture.md` block + subsystem `Contracts` + ADR `Source:` | `## Contracts & integrations` + `\| Counterparty \| Kind / protocol \| Shape \| Auth \| Errors \| Versioning \|` |
-| D9 | Documentation pass per repo, inputs = this repo only | O/`references/documentation-pass.md` → Principles + Step 3 + Step 4 (ADR `Source:`); O/`references/phase-map.md` → row 6; O/`SKILL.md` → "Routing per phase" (6) | `once per target repo` + `never <slug>-feature.md` |
+| D9 | Documentation pass per repo, inputs = this repo only | O/`references/documentation-pass.md` → Principles + Step 3 + Step 4 (ADR `Source:`); O/`references/phase-map.md` → row 6; O/`SKILL.md` → "Routing per phase" (6) | `once per target repo` + `` never `<slug>-feature.md` `` |
 | D10 | Working tree, existing draft, ADR number, sha256 list | O/`references/documentation-pass.md` → Principles + Step 0 + Step 4 + Step 5 + Step 6; O/`references/handoff-prompt.md` → phase-7 line | `in the repo's working tree` + `existing uncommitted draft` + `with its sha256` |
 | D11 | Executor phase 7: self-contained, contracts match, unlisted change → blocked | E/`SKILL.md` → Step 3 phase 7 + Hard rules; E/`references/phase-map.md` → row 7 | `no path or link into another repository` + `Contracts & integrations` (both E files) |
 | D12 | Gate 1 per-repo; phase 5 contracts from matrix + Provides/Consumes | O/`references/phase-map.md` → row 1; O/`references/integration-verification.md` → Method step 1 | `against its own repo's spec` + `contract matrix` |
@@ -482,7 +482,7 @@ After:
   systems appear only by name, as the counterparty of a contract, with the
   contract's shape written out in the file. No path or link into another repo.
 - **One pass per repo.** Run the pass once per target repo. Its inputs are that
-  repo's `<slug>-design.md`, its plan and its code — never <slug>-feature.md
+  repo's `<slug>-design.md`, its plan and its code — never `<slug>-feature.md`
   and never the cross-repo picture from phase 5.
 - **Working tree, not remote.** Author in the repo's working tree and read the
   design home from there first, never from a remote or cached copy. Continue an
@@ -1173,7 +1173,7 @@ A = {
          (O+'references/architecture-doc-template.md', '| Counterparty | Kind / protocol | Shape | Auth | Errors | Versioning |'),
          (O+'references/architecture-doc-template.md', '<path in this repo to the plan or spec that implemented this>')],
  'D9':  [(O+'references/documentation-pass.md', 'once per target repo'),
-         (O+'references/documentation-pass.md', 'never <slug>-feature.md'),
+         (O+'references/documentation-pass.md', 'never `<slug>-feature.md`'),
          (O+'references/documentation-pass.md', 'naming a path in this repo'),
          (O+'references/phase-map.md', "per repo, from that repo's spec + plan + code"),
          (O+'SKILL.md', 'once per target repo')],
