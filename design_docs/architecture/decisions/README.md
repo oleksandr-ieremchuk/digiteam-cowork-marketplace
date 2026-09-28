@@ -15,3 +15,4 @@ decision = a new ADR + flipping the old one's status to `superseded by NNNN`.
 | 0004 | Chat-only HandOff / Report protocol, no shared state | accepted |
 | 0005 | Naming, versioning and author fields | accepted |
 | 0006 | LF line endings enforced by `.gitattributes` | accepted |
+| 0007 | The executor's slash command is the first line of every HandOff | accepted |

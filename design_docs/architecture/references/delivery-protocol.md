@@ -29,11 +29,21 @@ Each side carries its own copy of both block shapes:
 
 ## Contracts
 
-**HandOff** header `Delivery HandOff — <slug> — repo: <repo>`, then `Spec`,
-`Your scope in this repo`, `Phase to run` (one of 0b / 2 / 4 / 7 / 8), `Gate
-already passed`, a `Do:` list naming the superpowers skill to use, an optional
-`Fix:` block (corrective HandOffs only), `Acceptance criteria for this repo`,
-and a `Report back:` list of the fields expected.
+**HandOff** opens with the executor's own slash command,
+`/delivery-executor:executing-delivery-handoff`, alone on the first line. The
+header `Delivery HandOff — <slug> — repo: <repo>` follows, then `Spec`, `Your
+scope in this repo`, `Phase to run` (one of 0b / 2 / 4 / 7 / 8), `Gate already
+passed`, a `Do:` list naming the superpowers skill to use, an optional `Fix:`
+block (corrective HandOffs only), `Acceptance criteria for this repo`, and a
+`Report back:` list of the fields expected. The slash line carries no data; the
+executor ignores it when parsing.
+
+**How the HandOff arrives.** Pasted as one message, the first line invokes the
+executor skill and the rest of the block reaches it as that command's argument.
+Two fallbacks are part of the contract rather than accidents: the block pasted
+without its first line is still self-describing, and the skill stays
+model-invocable so it can pick it up; and the command sent with nothing after it
+makes the skill ask for the block and stop, instead of guessing.
 
 **Report** header `Delivery Report — <slug> — repo: <repo>`, then exactly these
 fields in this order: `Phase completed` (0b / 2 / 4 / 7 / 8 / `none —
@@ -46,20 +56,22 @@ gates 1, 3, 5 (and 7 for Code); plan stages `drafts → ongoing → done →
 documented`, moved only by Code, each move its own commit. The slug ties every
 artifact of a feature together across repos.
 
-**Parity rule.** The Report block in the two `report-format.md` files must be
-byte-identical between the header line and `Ready for gate`; the HandOff
-template and the HandOff shape must carry the same fields in the same order —
-with one allowed difference: the optional `Fix:` block (corrective HandOffs
-only) sits inline in the executor's shape and in a separate "Corrective
-HandOff" section of the orchestrator's template. Annotations may differ. This is the cross-plugin check the orchestrator's
-integration-verification gate runs on this repository.
+**Parity rule.** Both HandOff blocks open with the slash command line. The
+Report block in the two `report-format.md` files must be byte-identical between
+the header line and `Ready for gate`; the HandOff template and the HandOff shape
+must carry the same fields in the same order — with one allowed difference: the
+optional `Fix:` block (corrective HandOffs only) sits inline in the executor's
+shape and in a separate "Corrective HandOff" section of the orchestrator's
+template. Annotations may differ. This is the cross-plugin check the
+orchestrator's integration-verification gate runs on this repository.
 
 ## Lifecycle / flow
 
 1. Cowork computes the feature's phase from the target repo's stage folders
    plus the latest pasted Report, and emits a HandOff for the phase Code owns
    next.
-2. The user pastes it into Claude Code in the target repo. The executor skill
+2. The user pastes it into Claude Code in the target repo as a single message.
+   Its first line invokes the executor skill and hands it the rest. The skill
    verifies repo, spec and plan stage against the requested phase; on mismatch
    it prints a Report with `Phase completed: none — blocked` and stops.
 3. Code runs exactly that phase, moves the plan stage where the phase says,
@@ -72,5 +84,7 @@ integration-verification gate runs on this repository.
 - Chat-only, no shared files — [ADR 0004](../decisions/0004-chat-only-handoff-report-protocol.md).
 - Two plugins rather than one, so each tool holds only its half of the rules —
   [ADR 0002](../decisions/0002-two-plugins-split-by-tool.md).
+- Invocation is deterministic by slash command, not by description matching —
+  [ADR 0007](../decisions/0007-slash-command-first-line-of-every-handoff.md).
 - The redundant copies are a maintenance cost accepted on purpose; the parity
   rule and the integration gate are what keep them honest.

@@ -37,13 +37,16 @@ repository follows the same convention for its own features.
   `README.md`, and one skill under `skills/<skill>/`. Skills are auto-discovered
   from `skills/`; no `skills`, `hooks`, `agents`, `mcpServers` or
   `dependencies` fields are declared.
-- **Skills** — a `SKILL.md` (frontmatter `name` + `description` that drives
-  triggering, then the procedure) plus `references/*.md` the skill reads on
-  demand. The orchestrator skill carries 8 references (phase map, HandOff
-  template, Report format, state discovery, integration verification, the
-  documentation pass, the architecture-doc template, and an optional in-repo
-  README lifecycle text); the executor carries 3 (HandOff format, phase map
-  from the executor's side, Report format).
+- **Skills** — a `SKILL.md` (frontmatter `name` + `description`, then the
+  procedure) plus `references/*.md` the skill reads on demand. The executor is
+  invoked deterministically by its own slash command, carried as the first line
+  of every HandOff; the `description` is the fallback path, not the primary one
+  ([ADR 0007](decisions/0007-slash-command-first-line-of-every-handoff.md)).
+  The orchestrator skill carries 8 references (phase map, HandOff template,
+  Report format, state discovery, integration verification, the documentation
+  pass, the architecture-doc template, and an optional in-repo README
+  lifecycle text); the executor carries 3 (HandOff format, phase map from the
+  executor's side, Report format).
 - **The HandOff / Report protocol** — the only interface between the two
   plugins. Chat text, never files. Detail:
   [references/delivery-protocol.md](references/delivery-protocol.md).
