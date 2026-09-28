@@ -31,12 +31,15 @@ Each side carries its own copy of both block shapes:
 
 **HandOff** opens with the executor's own slash command,
 `/delivery-executor:executing-delivery-handoff`, alone on the first line. The
-header `Delivery HandOff — <slug> — repo: <repo>` follows, then `Spec`, `Your
-scope in this repo`, `Phase to run` (one of 0b / 2 / 4 / 7 / 8), `Gate already
-passed`, a `Do:` list naming the superpowers skill to use, an optional `Fix:`
+header `Delivery HandOff — <slug> — repo: <repo>` follows, then `Spec`,
+`Phase to run` (one of 0b / 2 / 4 / 7 / 8), `Gate already passed`, a `Do:` list naming the superpowers skill to use, an optional `Fix:`
 block (corrective HandOffs only), `Acceptance criteria for this repo`, and a
 `Report back:` list of the fields expected. The slash line carries no data; the
-executor ignores it when parsing.
+executor ignores it when parsing. `Spec` is always this repo's own
+`design_docs/<slug>-design.md`, and that spec is the whole scope, so there is
+no separate scope field and a HandOff never names another repo's files. The
+phase-7 HandOff lists every doc file Cowork authored, each with its sha256;
+the phase-8 HandOff repeats that list for Code to commit.
 
 **How the HandOff arrives.** Pasted as one message, the first line invokes the
 executor skill and the rest of the block reaches it as that command's argument.
@@ -51,8 +54,18 @@ blocked`), `Plan stage now` (drafts / ongoing / done / documented / `none`),
 `What changed`, `Functional verification`, `Deviations from plan`, `Blockers`,
 `Ready for gate` (plan review / deploy approval / acceptance / docs review / —).
 
-**Shared vocabulary.** Phases 0a–8 with owners as in the phase map; Cowork-owned
-gates 1, 3, 5 (and 7 for Code); plan stages `drafts → ongoing → done →
+**Spec convention.** Every target repo holds its own spec,
+`design_docs/<slug>-design.md`, describing only the changes to make there, with
+its Provides / Consumes contracts written out. A multi-repo feature also has a
+feature record, `design_docs/<slug>-feature.md`, in one primary repo: the only
+file allowed to talk about several repos, holding the target-repo list and the
+cross-repo contract matrix. A single-repo feature has no feature record; its
+design file doubles as one.
+
+**Shared vocabulary.** Phases 0a–8 with owners as in the phase map; the gate
+**specs consistent** closes 0a (contract matrix against each repo's Provides /
+Consumes, and every spec self-contained); Cowork-owned gates 1, 3, 5 (and 7 for
+Code); plan stages `drafts → ongoing → done →
 documented`, moved only by Code, each move its own commit. The slug ties every
 artifact of a feature together across repos.
 
@@ -67,15 +80,19 @@ orchestrator's integration-verification gate runs on this repository.
 
 ## Lifecycle / flow
 
-1. Cowork computes the feature's phase from the target repo's stage folders
-   plus the latest pasted Report, and emits a HandOff for the phase Code owns
-   next.
+1. Cowork finds the target repos (from the feature record, or the single
+   repo holding the design file; it asks when that is ambiguous), computes the
+   feature's phase from each repo's stage folders plus the latest pasted Report,
+   and emits a HandOff for the phase Code owns next.
 2. The user pastes it into Claude Code in the target repo as a single message.
    Its first line invokes the executor skill and hands it the rest. The skill
    verifies repo, spec and plan stage against the requested phase; on mismatch
    it prints a Report with `Phase completed: none — blocked` and stops.
 3. Code runs exactly that phase, moves the plan stage where the phase says,
-   and prints the Report as the last thing in its output.
+   and prints the Report as the last thing in its output. At phase 7 the listed
+   doc files are uncommitted by design; any other uncommitted change in the
+   design home blocks. At phase 8 Code commits exactly those files, then moves
+   the plan `done → documented` in its own commit.
 4. The user pastes the Report back. Cowork decides the gate: pass → next
    HandOff; fail → a corrective HandOff with a `Fix:` block, same gate re-run.
 
@@ -86,5 +103,11 @@ orchestrator's integration-verification gate runs on this repository.
   [ADR 0002](../decisions/0002-two-plugins-split-by-tool.md).
 - Invocation is deterministic by slash command, not by description matching —
   [ADR 0007](../decisions/0007-slash-command-first-line-of-every-handoff.md).
+- Specs and docs are repo-local; the spec is the scope —
+  [ADR 0008](../decisions/0008-repo-local-specs-and-docs.md).
+- The gate "specs consistent" closes 0a —
+  [ADR 0009](../decisions/0009-specs-consistent-gate.md).
+- Docs are authored in the working tree, reviewed by hash, committed at phase 8 —
+  [ADR 0010](../decisions/0010-working-tree-docs-and-phase-8-commit.md).
 - The redundant copies are a maintenance cost accepted on purpose; the parity
   rule and the integration gate are what keep them honest.

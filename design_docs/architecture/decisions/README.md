@@ -16,3 +16,6 @@ decision = a new ADR + flipping the old one's status to `superseded by NNNN`.
 | 0005 | Naming, versioning and author fields | accepted |
 | 0006 | LF line endings enforced by `.gitattributes` | accepted |
 | 0007 | The executor's slash command is the first line of every HandOff | accepted |
+| 0008 | Repo-local specs and docs; the spec is the scope | accepted |
+| 0009 | Gate "specs consistent" closes phase 0a | accepted |
+| 0010 | Docs authored in the working tree, reviewed by hash, committed at phase 8 | accepted |
