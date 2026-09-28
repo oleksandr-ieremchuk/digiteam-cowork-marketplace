@@ -100,7 +100,7 @@ an allowlist and would break on a rename.
 
 | # | Phase | Owner | Tool / artifact | Gate |
 |---|-------|-------|-----------------|------|
-| 0a | Brainstorm + spec (across all target repos) | Cowork | `superpowers:brainstorming` → spec in `design_docs/` (lists target repos + per-repo scope) | — |
+| 0a | Brainstorm + specs | Cowork | `superpowers:brainstorming` → one `design_docs/<slug>-design.md` per target repo; multi-repo: plus `design_docs/<slug>-feature.md` in the primary repo | **specs consistent** |
 | 0b | Plan from spec | Code (per repo) | HandOff → Code runs `superpowers:writing-plans` → plan in `drafts/` | — |
 | 1 | Plan review | Cowork | read each draft plan; check it against the spec | **plan approved** |
 | 2 | Execution | Code (per repo) | plan `drafts → ongoing`; `superpowers:executing-plans` | — |
@@ -122,8 +122,10 @@ starts only once **every** target repo reports `done`.
 The process expects two things in every repo it drives, and this repo follows
 them itself:
 
-- `design_docs/` — one spec per feature, `<slug>-design.md`, listing the target
-  repos and the per-repo scope.
+- `design_docs/` — one spec per feature per repo, `<slug>-design.md`,
+  describing only that repo's changes and its Provides / Consumes contracts. A
+  multi-repo feature also has `<slug>-feature.md` in its primary repo, the only
+  file that talks about several repos.
 - `engineering_plans/{drafts,ongoing,done,documented}/` — one plan per feature
   per repo. **The stage folder is the durable phase signal:** `drafts` planned,
   `ongoing` executing, `done` shipped + functionally verified, `documented`
