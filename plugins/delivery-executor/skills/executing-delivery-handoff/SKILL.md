@@ -57,7 +57,9 @@ If a field you need is missing, ask before doing anything.
    but there is no plan) means Cowork's picture of this repo is stale: **do not
    guess** — print a Report with the mismatch under `Blockers` and stop.
 4. **Clean tree.** `git status` shows no unrelated uncommitted changes. If it
-   does, ask the user how to proceed rather than mixing work.
+   does, ask the user how to proceed rather than mixing work. In phase 7 the doc
+   files the HandOff lists are expected to be uncommitted; any other uncommitted
+   change in the design home is a blocker (Step 3, phase 7), not a question.
 
 State what you found (repo, spec, plan stage, phase) before acting.
 
@@ -85,8 +87,10 @@ Details per phase in `references/phase-map.md`. In short:
   real code; they are self-contained (no path or link into another repository);
   the **Contracts & integrations** tables (Provides / Consumes) match the real
   interfaces. Approve only when there are none. No plan move in this phase.
-- **8 — move to documented.** `git mv` the plan `done → documented` and commit.
-  Nothing else.
+- **8 — move to documented.** Commit exactly the doc files the phase-7 HandOff
+  listed, after checking each against its sha256 (a mismatch or any extra file →
+  blocked Report). Then `git mv` the plan `done → documented` and commit that move
+  on its own. Nothing else.
 
 **Corrective HandOff** (`Gate already passed: none — corrective`, with a `Fix:`
 block): address the `Fix:` items only. Do not redo the phase from scratch and
@@ -116,10 +120,10 @@ file and do not commit it.
   `Blockers` instead.
 - **The stage folder is the truth.** Every stage move is a `git mv` plus a
   commit, done at the moment the phase says. Cowork gates on that folder.
-- **Stay in scope.** Implement what the spec assigns to this repo and what the
-  plan says. Cross-repo contracts you depend on (an API another repo ships, a
-  shared version) are taken as given from the spec — if reality differs, that
-  is a blocker for Cowork's integration gate, not something to patch around.
+- **Stay in scope.** Implement what this repo's spec and the plan say.
+  Cross-repo contracts you depend on (an API another repo ships, a shared
+  version) are taken as given from the spec — if reality differs, that is a
+  blocker for Cowork's integration gate, not something to patch around.
 - **Report deviations honestly.** If you departed from the plan, say what and
   why. Cowork decides whether it passes the gate.
 - **Never fabricate verification.** "Functional verification" in the Report

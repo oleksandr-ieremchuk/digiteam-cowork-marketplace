@@ -133,9 +133,10 @@ docs match the real code.
 
 ### Step 7 — Hand off the move
 
-On Code's docs-approval (phase 7), the move `done/<slug>.* → documented/<slug>.*`
-for exactly the reflected plans, plus the commit, is Code's (phase 8) — it's in
-the HandOff. Do not run git yourself. Once moved, the Step 2 backlog no longer
+On Code's docs-approval (phase 7), committing exactly the approved doc files and
+then the move `done/<slug>.* → documented/<slug>.*` for exactly the reflected
+plans are Code's (phase 8) — both are in the HandOff, with the file list and
+sha256. Do not run git yourself. Once moved, the Step 2 backlog no longer
 shows those plans, so the next pass is automatically scoped to new work only.
 
 ## Properties to preserve

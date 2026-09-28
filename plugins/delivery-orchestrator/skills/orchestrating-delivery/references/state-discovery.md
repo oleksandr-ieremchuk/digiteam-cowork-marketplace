@@ -14,8 +14,8 @@ idempotent and safe to resume after any interruption.
   - No feature file, and `<slug>-design.md` in exactly one repo → a single-repo
     feature; that repo is the primary and its design file doubles as the feature
     record.
-  - Zero or several feature files (or no feature file and several design files)
-    → ask the user; never guess.
+  - Several feature files, or no feature file and zero or several
+    `<slug>-design.md` → ask the user; never guess.
 - For each **target repo**:
   - Is this repo's own spec, `<slug>-design.md`, present in `design_docs/` (or
     the repo's design home)?

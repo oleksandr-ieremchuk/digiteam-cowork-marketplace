@@ -62,7 +62,9 @@ Report back:
   line>. Confirm they match the real code, contain no path or link into another
   repo, and that Contracts & integrations matches the real interfaces; approve
   or list mismatches."
-- **8 (move to documented):** "Move the plan `done → documented` and commit."
+- **8 (move to documented):** "Commit the doc files approved at phase 7 — these
+  files, each with its sha256: <path — sha256, one per line>; then move the plan
+  `done → documented` in its own commit."
 
 ## Corrective HandOff (after a failed gate)
 

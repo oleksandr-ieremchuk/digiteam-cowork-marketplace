@@ -34,6 +34,9 @@ cross-cutting concerns (scheduling, observability).
 
 ## Contracts & integrations
 
+Mandatory in every `architecture.md`. If a table has nothing to list, keep it
+with a single row that says none.
+
 What this repo offers others and what it depends on. Counterparties are named,
 never linked into another repo; the shape is written out here or in a file in
 this repo.

@@ -2,7 +2,7 @@
 
 Cowork pastes one of these per repo. It is chat text, never a file. Treat it as
 the authoritative statement of *what to do in this repo now*; treat the spec and
-the plan it points to as the authoritative statement of *what the feature is*.
+the plan it points to as the authoritative statement of *what this repo must deliver*.
 
 It normally reaches you as the argument of your own slash command — the block's
 first line is `/delivery-executor:executing-delivery-handoff`, so the rest
