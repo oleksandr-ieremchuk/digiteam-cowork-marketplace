@@ -26,7 +26,16 @@ author prose only — Claude Code reviews it (phase 7) and does the git move
   is reflected and its move is handed off. Re-running with nothing new proposes
   nothing.
 - **Discover, don't hardcode.** Find paths and the subsystem list by inspecting
-  the repo, so this works in any repository.
+  the repo, so this works in whichever repository it is run for.
+- **Repo-local.** Everything you write describes only this repo. Other repos and
+  systems appear only by name, as the counterparty of a contract, with the
+  contract's shape written out in the file. No path or link into another repo.
+- **One pass per repo.** Run the pass once per target repo. Its inputs are that
+  repo's `<slug>-design.md`, its plan and its code — never `<slug>-feature.md`
+  and never the cross-repo picture from phase 5.
+- **Working tree, not remote.** Author in the repo's working tree and read the
+  design home from there first, never from a remote or cached copy. Continue an
+  existing uncommitted draft for the slug rather than writing a parallel one.
 
 ## The pass — step by step
 
@@ -37,8 +46,13 @@ Find conventions by inspection: the design/architecture home (usually
 `<design-home>/architecture/` and the decision log at
 `architecture/decisions/`; the plan lifecycle folders
 (`engineering_plans/{drafts,ongoing,done}` + the terminal `documented/`). Check
-whether the convention already exists. State what you found before changing
-anything.
+whether the convention already exists.
+
+Work in the repo's working tree: read the design home there, not from a remote
+copy. Before writing anything, look for an existing uncommitted draft for this
+slug (architecture files changed but not committed, or an ADR covering the
+plan's decisions). If there is one, continue it instead of writing a parallel
+version. State what you found before changing anything.
 
 ### Step 1 — First-run scaffold (only if the convention is absent)
 
@@ -61,7 +75,9 @@ The work = plans in `done/` whose slug is **not** in `documented/`. List them
 
 ### Step 3 — Extract the delta + the decisions (per plan)
 
-For each undocumented plan, read **the plan and its paired spec**. Distil:
+For each undocumented plan, read **this repo's plan, this repo's
+`<slug>-design.md` and its code**. Never read `<slug>-feature.md` or another
+repo's files for this. Distil:
 
 (a) the **net architectural change** — new/changed components and their
 responsibility; public contracts (APIs, tool signatures, message/data shapes,
@@ -82,8 +98,12 @@ Fold the delta in at the right altitude: basic/structural facts → `architectur
 core sections (keep it readable end-to-end); detail → the relevant
 `references/<subsystem>.md` (new reference only for a genuinely new subsystem,
 else extend); keep the manifest table in sync and correct superseded facts in
-place. Record each newly-shipped material decision as an ADR at
-`architecture/decisions/NNNN-<slug>.md` (next free number, append-only); a
+place. Keep `architecture.md`'s **Contracts & integrations** section (Provides /
+Consumes) in sync: every interface this repo now offers or depends on has its
+row, with the shape written out. Record each newly-shipped material decision as
+an ADR at `architecture/decisions/NNNN-<slug>.md` (next free number, counted in
+the working tree including uncommitted ADRs; append-only), with `Source:`
+naming a path in this repo; a
 decision that supersedes another flips the old ADR's status to `superseded by
 NNNN` with a forward pointer — never edit history away. Link each ADR from the
 subsystem reference it affects. Use `references/architecture-doc-template.md` for
@@ -91,21 +111,25 @@ all shapes.
 
 Test of done: a new engineer could read `architecture.md` + the touched reference
 and understand how this part works *today*, and find in `decisions/` *why* the
-non-obvious choices were made — without reading the plan.
+non-obvious choices were made — without reading the plan and without opening
+any other repository.
 
 ### Step 5 — Consistency check
 
 Verify before presenting: every `references/` file appears in the manifest and
 every manifest row resolves (no dangling/orphan); ADR numbering is monotonic,
 every ADR has a status, every `superseded` points forward; no broken internal
-links. Fix mismatches.
+links; no path or link into another repo in any touched file; every ADR number
+is unique on disk in the working tree (no two files share `NNNN`). Fix
+mismatches.
 
 ### Step 6 — Present the doc changes
 
 Show the proposed doc diff (or a tight summary), the ADRs you're adding, and the
 exact list of plans that will advance `done → documented`. This is the doc-review
-handoff: build a HandOff (see `handoff-prompt.md`, phase 7) asking Code to
-confirm the docs match the real code.
+handoff: build a HandOff (see `handoff-prompt.md`, phase 7) that lists every
+file you authored or changed, each with its sha256, and asks Code to confirm the
+docs match the real code.
 
 ### Step 7 — Hand off the move
 

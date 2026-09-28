@@ -14,7 +14,7 @@ are recorded — not when the code merges.
 Lifecycle:
 
   brainstorm
-    -> design_docs/<topic>-design.md            (spec)
+    -> design_docs/<slug>-design.md             (this repo's spec; multi-repo: plus <slug>-feature.md in the primary repo)
     -> engineering_plans/drafts -> ongoing -> done   (implementation)
     -> (at work-acceptance) architecture/ + decisions/ updated + plan -> engineering_plans/documented/
 
@@ -31,7 +31,7 @@ Lifecycle:
 ### The acceptance pass
 
 When completed work is handed back, run the documentation pass: read each plan in
-`done/` not yet in `documented/` (plus its paired spec), fold the net
+`done/` not yet in `documented/` (plus this repo's `<slug>-design.md`), fold the net
 architectural delta into `architecture.md` and/or the relevant
 `architecture/references/<subsystem>.md`, record the decisions it implemented as
 ADRs under `architecture/decisions/`, update the manifest, then move the plan

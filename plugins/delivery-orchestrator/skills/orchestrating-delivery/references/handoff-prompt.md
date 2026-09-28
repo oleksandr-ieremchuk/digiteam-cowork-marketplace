@@ -5,8 +5,10 @@ a file. The user opens Claude Code in the target repo and pastes it; Code does
 the actual git/code work and prints a Report back (see `report-format.md`).
 
 Keep it a pointer, not a re-derivation of the spec: Code reads the spec and the
-plan itself. State the phase to run, the gate already passed, and the per-repo
-acceptance criteria, then name the `superpowers` skill to use.
+plan itself. The spec is this repo's own `<slug>-design.md` and is the whole
+scope, so there is no separate scope field, and the HandOff never names
+another repo's files. State the phase to run, the gate already passed, and the
+acceptance criteria for this repo, then name the `superpowers` skill to use.
 
 **The first line of every HandOff is the executor's slash command**,
 `/delivery-executor:executing-delivery-handoff`, followed by the block. Pasted
@@ -24,8 +26,7 @@ and runs the block by hand — it is self-describing.
 /delivery-executor:executing-delivery-handoff
 Delivery HandOff — <feature-slug> — repo: <repo-name>
 
-Spec: <path to design_docs/...-design.md in this repo>
-Your scope in this repo: <the slice of the feature this repo owns>
+Spec: <design_docs/<feature-slug>-design.md — this repo's own spec>
 Phase to run: <0b write the plan | 2 execute | 4 deploy + functional verify | 7 review docs | 8 move done→documented>
 Gate already passed: <e.g. "plan approved 2026-06-16" | "none — first handoff">
 
@@ -50,14 +51,17 @@ Report back:
 
 ## Phase-specific instruction line
 
-- **0b (plan):** "Read the spec, write the implementation plan for this repo's
-  scope with `superpowers:writing-plans`, leave it in `drafts/`."
+- **0b (plan):** "Read the spec, write the implementation plan for this repo
+  with `superpowers:writing-plans`, leave it in `drafts/`."
 - **2 (execute):** "Move the plan `drafts → ongoing` and execute it with
   `superpowers:executing-plans`."
 - **4 (deploy + verify):** "Deploy, run functional verification in this repo,
   then move the plan `ongoing → done`."
-- **7 (review docs):** "Review the architecture-doc changes Cowork authored;
-  confirm they match the real code; approve or list mismatches."
+- **7 (review docs):** "Review the architecture-doc changes Cowork authored in
+  the working tree — these files, each with its sha256: <path — sha256, one per
+  line>. Confirm they match the real code, contain no path or link into another
+  repo, and that Contracts & integrations matches the real interfaces; approve
+  or list mismatches."
 - **8 (move to documented):** "Move the plan `done → documented` and commit."
 
 ## Corrective HandOff (after a failed gate)

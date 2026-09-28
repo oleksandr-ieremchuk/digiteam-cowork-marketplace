@@ -27,9 +27,15 @@ the user pastes back.
 ## The division of labour (hard)
 
 - **Cowork (you)** reason about the feature **across all its repositories**: the
-  spec, the review gates, cross-repo integration verification, and the
+  specs, the review gates, cross-repo integration verification, and the
   documentation prose. You read any repo read-only and you author *content*
-  (spec, architecture docs) as files for Claude Code to commit.
+  (specs, architecture docs) as files for Claude Code to commit.
+- **Repo-local rule.** Everything written into a repo — its spec, plan,
+  architecture docs and ADRs — describes only that repo. Other repos and systems
+  appear only by name, as the counterparty of a contract, with the contract's
+  shape written out in the file. No path or link into another repo, ever. The
+  single exception is the feature record, `<slug>-feature.md`, in the primary
+  repo (see "Routing per phase").
 - **Claude Code** does everything that touches **code and git inside one repo**:
   writing and executing the plan, deploying, functional verification, every move
   of a plan between stage folders, and all commits.
@@ -41,8 +47,9 @@ the user pastes back.
 ## The Cowork ↔ Code interface: HandOff and Report (chat only)
 
 - **HandOff (you → Code):** a copy-paste chat block, one per repo, that tells
-  Claude Code which repo, which spec, the scope for that repo, the phase to
-  execute, the gate already passed, and the acceptance criteria. Its first line
+  Claude Code which repo, that repo's own spec (its `<slug>-design.md`, which
+  is the whole scope), the phase to execute, the gate already passed, and the
+  acceptance criteria. Its first line
   is always `/delivery-executor:executing-delivery-handoff`, so pasting it
   invokes the executor skill. Build it from `references/handoff-prompt.md`.
   Never write it to a file.
@@ -57,9 +64,12 @@ disk.
 ## Locating the current phase
 
 A feature is identified by a **slug** shared across all its repos (declared in
-the spec, else the spec filename). To place it, inspect each target repo per
-`references/state-discovery.md`: is the spec present? is there a plan for the
-slug, and in which stage folder (`drafts` / `ongoing` / `done` / `documented`)?
+the spec, else the spec filename). Find its target repos per
+`references/state-discovery.md`: from the primary repo's `<slug>-feature.md`,
+or, with no feature file, from the one repo holding `<slug>-design.md`. If
+that is ambiguous, ask the user; never guess. Then inspect each target repo: is
+its own `<slug>-design.md` present? is there a plan for the slug, and in which
+stage folder (`drafts` / `ongoing` / `done` / `documented`)?
 Combine with the most recent pasted Report. Per-repo phase follows from the plan
 stage; the feature phase is the aggregate — it cannot pass the integration gate
 until **every** target repo has reached `done`.
@@ -69,8 +79,9 @@ State what you found before acting.
 ## The phases and gates
 
 The full table — owner, tool, and gate for each phase — is in
-`references/phase-map.md`. In short: brainstorm + spec (you) → plan (Code, per
-repo) → **you review & approve the plan** → execute (Code) → **you review changes
+`references/phase-map.md`. In short: brainstorm + per-repo specs (you) → **you
+check the specs consistent** → plan (Code, per repo) → **you review & approve
+the plan** → execute (Code) → **you review changes
 & approve deploy** → deploy + functional verification (Code) → **you accept &
 run cross-repo integration verification** → the documentation pass (you, prose
 only) → **Code reviews the docs** → Code
@@ -83,19 +94,38 @@ re-check. This loop is the normal path, not an error.
 
 ## Routing per phase
 
-- Phase 0a (spec) → use `superpowers:brainstorming`, then write the spec to
-  `design_docs/`. The spec must list the target repos and the per-repo scope.
+- Phase 0a (spec) → use `superpowers:brainstorming`, then write one spec per
+  target repo: `design_docs/<slug>-design.md` in that repo, describing only the
+  changes to make there, with its own Provides / Consumes contracts and
+  acceptance criteria (shape in `references/architecture-doc-template.md`).
+  - **Multi-repo feature:** choose a **primary repo**. Propose the one holding
+    the entry point or the core value, and the user confirms. Write
+    `design_docs/<slug>-feature.md` there: goal, target repos, per-repo scope
+    summary, cross-repo contract matrix, shared decisions, integration-
+    verification plan. It is the only file allowed to talk about several repos.
+    It is not folded into the primary repo's architecture docs, and no per-repo
+    spec links to it.
+  - **Single-repo feature:** only `<slug>-design.md`. That repo is the primary
+    by definition, and its design file doubles as the feature record.
+- Gate **specs consistent** (closes 0a, before any 0b HandOff) → check that
+  every row of the contract matrix appears, with the identical shape, in the
+  producer's Provides and the consumer's Consumes, and that every per-repo spec
+  is self-contained (repo-local rule). Single-repo: self-containment only. A
+  failure means fixing the specs; no HandOff goes out until it passes.
 - Phase 0b / 2 (plan / execute) → these run in Claude Code; you only emit the
   HandOff. Tell Code to use `superpowers:writing-plans` / `executing-plans`.
 - Phase 5 (integration verification) → run it yourself, cross-repo and
   read-only, per `references/integration-verification.md`.
 - Phase 6 (documentation) → run the documentation pass in
-  `references/documentation-pass.md`. You author the architecture prose and ADRs;
+  `references/documentation-pass.md` once per target repo, from that repo's own
+  spec, plan and code. You author the architecture prose and ADRs;
   Code reviews them (phase 7) and does the `done → documented` move (phase 8).
 
 ## Multi-repo fan-out
 
-One spec fans out into one HandOff per target repo, all tied by the slug.
+One feature fans out into one HandOff per target repo, all tied by the slug.
+Each HandOff points at that repo's own `<slug>-design.md`, never at the
+feature record or at another repo's spec.
 Per-repo work proceeds in parallel. The integration-verification gate (phase 5)
 is the join: it runs only once **all** target repos report `done`. The feature
 is finished only when every target repo reaches `documented`.
@@ -111,6 +141,8 @@ is finished only when every target repo reaches `documented`.
   issue a corrective HandOff and loop.
 - You orchestrate and review; you do not implement. Hand code work to Claude
   Code via a HandOff.
+- Repo-local: never write into a repo a path or link into another repo. Only the
+  primary repo's `<slug>-feature.md` names several repos.
 
 ## References
 
@@ -120,5 +152,5 @@ is finished only when every target repo reaches `documented`.
 - `references/integration-verification.md` — the cross-repo, read-only gate method.
 - `references/state-discovery.md` — how to compute the current phase from disk + the latest Report.
 - `references/documentation-pass.md` — the phase-6 documentation pass, step by step.
-- `references/architecture-doc-template.md` — shapes for `architecture.md`, subsystem references, and ADRs.
+- `references/architecture-doc-template.md` — shapes for `architecture.md`, subsystem references, ADRs, the per-repo spec, and the feature record.
 - `references/readme-lifecycle-amendment.md` — optional in-repo text describing the lifecycle.

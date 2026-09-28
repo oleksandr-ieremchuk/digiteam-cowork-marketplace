@@ -15,10 +15,15 @@ It is a **method, not a fixed script** — the contracts depend on the feature.
 
 ## Method
 
-1. **Derive the cross-repo contracts from the spec.** List every place where one
-   repo depends on something another repo shipped: tool/function signatures,
-   API or message shapes, shared version numbers or guide versions, file/path
-   conventions, config or env contracts.
+1. **Derive the cross-repo contracts** from the contract matrix in the primary
+   repo's `<slug>-feature.md` plus each target repo's Provides / Consumes in its
+   own `<slug>-design.md`. List every place where one repo depends on something
+   another repo shipped: tool/function signatures, API or message shapes, shared
+   version numbers or guide versions, file/path conventions, config or env
+   contracts. The gate "specs consistent" checked that the shapes agreed on
+   paper; this step checks that the shipped code agrees. For a single-repo
+   feature, the contracts are that spec's Provides / Consumes against its
+   external counterparties.
 2. **Exercise each contract end-to-end across the mounted repos**, read-only:
    - load or build the artifacts and check the consumer side resolves the
      producer side (e.g. repo A references a tool/version that repo B now ships);
